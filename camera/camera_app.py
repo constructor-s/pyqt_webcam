@@ -1,7 +1,7 @@
 from . import opencv2qimage, camera_gui
 
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot, QTimer, Qt
 
 import cv2
@@ -88,7 +88,7 @@ class CameraApp(QWidget):
 
     def getImage(self):
         image = self._camera.frame
-        if len(self._clicks) >= 2 and len(self._clicks) % 2 == 1:
+        if len(self._clicks) >= 2 and len(self._clicks) % 2 == 0:
             pt1, pt2 = [
                 tuple(round(i) for i in pt) for pt in self._clicks[-2:]
             ]
@@ -100,10 +100,18 @@ class CameraApp(QWidget):
     @pyqtSlot(bool)
     def saveImageAs(self, checked):
         _logger.info('saveImageAs:')
-
+        filename, _ = QFileDialog.getSaveFileName(
+            parent=self, caption='Save As', directory=self.filename,
+            filter="Images (*.bmp *.jpg *.jpeg *.png);;All files (*.*)"
+        )
+        if filename:
+            self.filename = filename
+            self.saveImage()
+        else:
+            QMessageBox.warning(self, 'Invalid File', 'The file chosen (%s) is invalid.' % filename)
 
     @pyqtSlot(bool)
-    def saveImage(self, checked):
+    def saveImage(self, checked=False):
         _logger.info('saveImage:')
         cv2.imwrite(self.filename, self.getImage())
         self.incrementFilename()
