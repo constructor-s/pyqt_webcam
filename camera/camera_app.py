@@ -42,6 +42,7 @@ class CameraApp(QWidget):
         self._ui.saveButton.setText('Save ' + self.filename)
 
         self._ui.previewLabel.mousePressEvent = self.getPos
+        self._ui.previewLabel.mouseReleaseEvent = self.getPos
 
 
     def _setupConnections(self):
@@ -70,15 +71,15 @@ class CameraApp(QWidget):
 
         if len(self._clicks) >= 2 and len(self._clicks) % 2 == 0:
             pt1, pt2 = (tuple(round(i) for i in pt) for pt in self._clicks[-2:])
-            image = image.copy()
-            cv2.rectangle(image, pt1, pt2, (0, 255, 0),
-                          thickness=image.shape[0] // 100, lineType=cv2.LINE_AA)
+            if not np.allclose(pt1, pt2, rtol=0, atol=1):
+                image = image.copy()
+                cv2.rectangle(image, pt1, pt2, (0, 255, 0),
+                              thickness=image.shape[0] // 100, lineType=cv2.LINE_AA)
         return image
 
     def getPos(self, event):
         x = event.pos().x()
         y = event.pos().y()
-        print(self.getImage().shape)
         height_in, width_in = self.getImage().shape[:2]
         width_out = self._ui.previewLabel.width()
         height_out = self._ui.previewLabel.height()
