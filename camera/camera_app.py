@@ -29,14 +29,7 @@ class CameraApp(QWidget):
 
         self._roi_start = None
         self._roi_end = None
-        self._zoom_start = None
-        self._zoom_end = None
-        self._zoom_released = False
-
-        self.x1 = None
-        self.x2 = None
-        self.y1 = None
-        self.y2 = None
+        self.zoomReset()
 
         self._rotate_count = 0
 
@@ -60,6 +53,7 @@ class CameraApp(QWidget):
         self._ui.rotatePushButton.clicked.connect(self.incrementRotateCount)
         self._ui.saveAsButton.clicked.connect(self.saveImageAs)
         self._ui.saveButton.clicked.connect(self.saveImage)
+        self._ui.zoomResetButton.clicked.connect(self.zoomReset)
 
         self._ui.brightnessSlider.setValue(self._camera.get(cv2.CAP_PROP_BRIGHTNESS))
         self._ui.brightnessSlider.valueChanged.connect(self._camera.setBrightness)
@@ -215,3 +209,15 @@ class CameraApp(QWidget):
     @pyqtSlot(bool)
     def incrementRotateCount(self, checked=False):
         self._rotate_count += 1
+
+    @pyqtSlot(bool)
+    def zoomReset(self, checked=False):
+        self._zoom_start = None
+        self._zoom_end = None
+        self._zoom_released = False
+
+        self.x1 = None
+        self.x2 = None
+        self.y1 = None
+        self.y2 = None
+        _logger.debug('Zoom variables reset')

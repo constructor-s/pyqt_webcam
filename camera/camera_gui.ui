@@ -117,6 +117,13 @@
                  </property>
                 </widget>
                </item>
+               <item>
+                <widget class="QPushButton" name="zoomResetButton">
+                 <property name="text">
+                  <string>Reset Zoom</string>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </widget>
             </item>
