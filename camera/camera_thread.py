@@ -7,13 +7,13 @@ class CameraThread(QThread):
     """
     See: https://docs.opencv.org/3.4.2/dd/d43/tutorial_py_video_display.html
     """
-    def __init__(self, camera_id=0, gui=False):
+    def __init__(self, camera_id=0, gui=False, parent=None):
         """
 
         :param camera_id:
         :param gui:
         """
-        super(CameraThread, self).__init__()
+        super(CameraThread, self).__init__(parent=parent)
 
         self._cap = cv2.VideoCapture(camera_id)
 
