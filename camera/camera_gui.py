@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'camera_gui.ui'
 #
-# Created by: PyQt5 UI code generator 5.9.2
+# Created by: PyQt5 UI code generator 5.6
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -32,6 +32,7 @@ class Ui_Camera(object):
         self.widget1.setSizePolicy(sizePolicy)
         self.widget1.setObjectName("widget1")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget1)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.previewLabel = QtWidgets.QLabel(self.widget1)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Ignored, QtWidgets.QSizePolicy.Ignored)
@@ -54,6 +55,18 @@ class Ui_Camera(object):
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem)
+        self.groupBox = QtWidgets.QGroupBox(self.formWidget)
+        self.groupBox.setObjectName("groupBox")
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.groupBox)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.roiButton = QtWidgets.QRadioButton(self.groupBox)
+        self.roiButton.setChecked(True)
+        self.roiButton.setObjectName("roiButton")
+        self.verticalLayout_2.addWidget(self.roiButton)
+        self.zoomButton = QtWidgets.QRadioButton(self.groupBox)
+        self.zoomButton.setObjectName("zoomButton")
+        self.verticalLayout_2.addWidget(self.zoomButton)
+        self.verticalLayout_3.addWidget(self.groupBox)
         self.label_2 = QtWidgets.QLabel(self.formWidget)
         self.label_2.setObjectName("label_2")
         self.verticalLayout_3.addWidget(self.label_2)
@@ -115,6 +128,7 @@ class Ui_Camera(object):
         self.horizontalWidget_2 = QtWidgets.QWidget(self.widget)
         self.horizontalWidget_2.setObjectName("horizontalWidget_2")
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.horizontalWidget_2)
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
         self.saveAsButton = QtWidgets.QPushButton(self.horizontalWidget_2)
         self.saveAsButton.setObjectName("saveAsButton")
@@ -135,6 +149,9 @@ class Ui_Camera(object):
         _translate = QtCore.QCoreApplication.translate
         Camera.setWindowTitle(_translate("Camera", "Camera"))
         self.previewLabel.setText(_translate("Camera", "Camera loading or not available"))
+        self.groupBox.setTitle(_translate("Camera", "Selection Mode"))
+        self.roiButton.setText(_translate("Camera", "ROI"))
+        self.zoomButton.setText(_translate("Camera", "Zoom"))
         self.label_2.setText(_translate("Camera", "Brightness"))
         self.brightnessLabel.setText(_translate("Camera", "TextLabel"))
         self.label_3.setText(_translate("Camera", "Contrast"))

@@ -27,7 +27,17 @@ class CameraApp(QWidget):
         self._ui.setupUi(self)
         self.show()
 
-        self._clicks = []
+        self._roi_start = None
+        self._roi_end = None
+        self._zoom_start = None
+        self._zoom_end = None
+        self._zoom_released = False
+
+        self.x1 = None
+        self.x2 = None
+        self.y1 = None
+        self.y2 = None
+
         self._rotate_count = 0
 
         self._camera = camera
@@ -41,8 +51,9 @@ class CameraApp(QWidget):
         self.filename = os.path.join(os.path.expanduser('~'), 'image_001.png')
         self._ui.saveButton.setText('Save ' + self.filename)
 
-        self._ui.previewLabel.mousePressEvent = self.getPos
-        self._ui.previewLabel.mouseReleaseEvent = self.getPos
+        self._ui.previewLabel.mousePressEvent = self.labelMousePressEvent
+        self._ui.previewLabel.mouseReleaseEvent = self.labelMouseReleaseEvent
+        self._ui.previewLabel.mouseMoveEvent = self.labelMouseMoveEvent
 
 
     def _setupConnections(self):
@@ -69,18 +80,70 @@ class CameraApp(QWidget):
         if self._isFliplr():
             image = np.fliplr(image)
 
-        if len(self._clicks) >= 2 and len(self._clicks) % 2 == 0:
-            pt1, pt2 = (tuple(round(i) for i in pt) for pt in self._clicks[-2:])
-            if not np.allclose(pt1, pt2, rtol=0, atol=1):
-                image = image.copy()
-                cv2.rectangle(image, pt1, pt2, (0, 255, 0),
-                              thickness=image.shape[0] // 100, lineType=cv2.LINE_AA)
+        image = self.drawROIRectange(image, self._roi_start, self._roi_end, (0, 255, 0))
+
+        if not self._zoom_released:
+            image = self.drawROIRectange(image, self._zoom_start, self._zoom_end, (0, 0, 255))
+        if self._zoom_released and self._zoom_start is not None and self._zoom_end is not None:
+            (x1, y1), (x2, y2) = (tuple(round(i) for i in pt) for pt in (self._zoom_start, self._zoom_end))
+            if x1 != x2 and y1 != y2:
+                self.x1, self.x2 = sorted([x1, x2])
+                self.y1, self.y2 = sorted([y1, y2])
+        if self.x1 is not None and self.x2 is not None and self.y1 is not None and self.y2 is not None:
+            image = image[self.y1:self.y2, self.x1:self.x2]
+
         return image
+
+    @staticmethod
+    def drawROIRectange(image, pt1, pt2, color=(0, 255, 0)):
+        if (pt1 is not None and pt2 is not None and
+                not np.allclose(pt1, pt2, rtol=0, atol=1)):
+            image = image.copy()
+            pt1, pt2 = [tuple(round(i) for i in j) for j in (pt1, pt2)]
+            cv2.rectangle(image, pt1, pt2, color,
+                          thickness=2, lineType=cv2.LINE_AA)
+
+        return image
+
+    def labelMousePressEvent(self, event):
+        image_x, image_y = self.getPos(event)
+        if self._ui.roiButton.isChecked():
+            self._roi_start = (image_x, image_y)
+            self._roi_end = None
+        elif self._ui.zoomButton.isChecked():
+            self._zoom_start = (image_x, image_y)
+            self._zoom_end = None
+            self._zoom_released = False
+        else:
+            _logger.error('Invalid selection mode')
+
+    def labelMouseReleaseEvent(self, event):
+        image_x, image_y = self.getPos(event)
+        if self._ui.roiButton.isChecked():
+            self._roi_end = (image_x, image_y)
+        elif self._ui.zoomButton.isChecked():
+            self._zoom_end = (image_x, image_y)
+            self._zoom_released = True
+        else:
+            _logger.error('Invalid selection mode')
+
+    def labelMouseMoveEvent(self, event):
+        image_x, image_y = self.getPos(event)
+        if self._ui.roiButton.isChecked():
+            self._roi_end = (image_x, image_y)
+        elif self._ui.zoomButton.isChecked():
+            self._zoom_end = (image_x, image_y)
+            self._zoom_released = False
+        else:
+            _logger.error('Invalid selection mode')
 
     def getPos(self, event):
         x = event.pos().x()
         y = event.pos().y()
-        height_in, width_in = self.getImage().shape[:2]
+        if self.x1 is None or self.x2 is None or self.y1 is None or self.y2 is None:
+            height_in, width_in = self.getImage().shape[:2]
+        else:
+            height_in, width_in = self.y2 - self.y1, self.x2 - self.x1
         width_out = self._ui.previewLabel.width()
         height_out = self._ui.previewLabel.height()
         scale = min(height_out * 1.0 / height_in, width_out * 1.0 / width_in)
@@ -88,12 +151,17 @@ class CameraApp(QWidget):
         height_offset = height_out - scale * height_in
         image_x = (x - 0.5 * width_offset) * 1.0 / scale
         image_y = (y - 0.5 * height_offset) * 1.0 / scale
+        if self.x1 is not None:
+            image_x += self.x1
+        if self.x2 is not None:
+            image_y += self.y1
 
         _logger.debug('GUI coord: %g,%g; Image coord: %g,%g; Input: %g,%g', x, y,
               image_x,
               image_y,
               width_in, height_in)
-        self._clicks.append((image_x, image_y))
+
+        return image_x, image_y
 
     @pyqtSlot()
     def renderPreview(self):

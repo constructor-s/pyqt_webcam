@@ -95,6 +95,32 @@
              </spacer>
             </item>
             <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string>Selection Mode</string>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+               <item>
+                <widget class="QRadioButton" name="roiButton">
+                 <property name="text">
+                  <string>ROI</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QRadioButton" name="zoomButton">
+                 <property name="text">
+                  <string>Zoom</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
              <widget class="QLabel" name="label_2">
               <property name="text">
                <string>Brightness</string>
