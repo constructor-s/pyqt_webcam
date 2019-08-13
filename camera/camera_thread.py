@@ -18,6 +18,7 @@ class CameraThread(QThread):
         self._cap = cv2.VideoCapture(camera_id)
 
         # Trick to get full _camera resolution with OpenCV: Set a very large resolution
+        self._cap.set(cv2.CAP_PROP_FPS, 0)
         self._cap.set(cv2.CAP_PROP_FRAME_WIDTH, 3840)
         self._cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 2160)
 
